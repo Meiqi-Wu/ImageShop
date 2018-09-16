@@ -1,6 +1,7 @@
 package imageshop;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -49,14 +50,13 @@ public class ImageShop extends JFrame implements ActionListener, MouseMotionList
 	public static void main(String[] args) {
 		ImageShop program = new ImageShop();
 		program.run();
-//		System.out.println('A'+1);
-//		System.out.println("ABCDE".substring(2,3) );
+//		int[] a = new int[2];
+//		a[0]++;
+//		System.out.println(a[0]);
 	}
 	
 	public void run() {
 		this.addMouseMotionListener(this);
-		
-
 	}
 	
 	/* Constructor. */
@@ -88,7 +88,7 @@ public class ImageShop extends JFrame implements ActionListener, MouseMotionList
 		JButton button7 = new JButton("Rotate right");
 		JButton button8 = new JButton("Flip Horizontal");
 		JButton button9 = new JButton("Translate");
-		JButton button10 = new JButton("blur");
+		JButton button10 = new JButton("Blur");
 		JButton button11 = new JButton("Equalize");
 		button1.addActionListener(this);
 		button2.addActionListener(this);
@@ -147,11 +147,11 @@ public class ImageShop extends JFrame implements ActionListener, MouseMotionList
 			setImage(newImage);
 			this.infolabel.setText(command + " filter applied.");
 		} else if(command.equals("Equalize")) {
-			GImage newImage = algorithms.greenScreen(currentImage);
+			GImage newImage = algorithms.equalize(currentImage);
 			setImage(newImage);
 			this.infolabel.setText(command + " filter applied.");
 		} else if(command.equals("Negative")) {
-			GImage newImage = algorithms.equalize(currentImage);
+			GImage newImage = algorithms.negative(currentImage); 
 			setImage(newImage);
 			this.infolabel.setText(command + " filter applied.");
 		} else if(command.equals("Translate")) {
@@ -186,8 +186,27 @@ public class ImageShop extends JFrame implements ActionListener, MouseMotionList
 //			String status = "(x=" + e.getX() + ", y="+e.getY()+")";
 //			
 //		}
-		String status = "(x=" + e.getX() + ", y="+e.getY()+")";
-		this.statsLabel.setText(status);
+		if(currentImage != null) {
+			int imageX = currentImage.getX();
+			int imageY = currentImage.getY();
+			int width = currentImage.getWidth();
+			int height = currentImage.getHeight();
+			int mouseX = e.getX();
+			int mouseY = e.getY();
+			String status = "";
+			int x = mouseX - imageX;
+			int y = mouseY - imageY;
+//			System.out.println("imageX = "+imageX+", imageY = "+imageY);
+//			status = "(x=" + mouseX + ", y="+mouseY+")";
+			if(x>0 && x<width && y>0 && y<height) {
+				Color col = new Color(currentImage.getRGB(x, y));
+				status = "(x=" + x + ", y="+ y +", R="+col.getRed()+", G="+col.getGreen()+", B="+
+				col.getBlue()+")";
+			} else {
+				status = "";
+			}
+			this.statsLabel.setText(status);
+		}
 	}
 	
 	// Shows a file prompt to load in a new image, and displays the chosen image on screen.
@@ -280,7 +299,7 @@ public class ImageShop extends JFrame implements ActionListener, MouseMotionList
 			int x = (currentImage.getWidth()-newImage.getWidth())/2;
 			int y = (currentImage.getHeight()-newImage.getHeight())/2;
 			Graphics g = currentImage.getGraphics();
-			g.drawImage(newImage, x, y, null);
+			g.drawImage(newImage, x, y, null); 
 		}
 		
 	}
